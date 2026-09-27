@@ -22,14 +22,6 @@ android {
     packagingOptions {
         jniLibs.useLegacyPackaging true
     }
-
-    sourceSets {
-        main {
-            java {
-                exclude 'org/firstinspires/ftc/teamcode/archived/**'
-            }
-        }
-    }
 }
 
 dependencies {
