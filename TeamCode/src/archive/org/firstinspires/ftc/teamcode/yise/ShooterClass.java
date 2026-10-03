@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.archived.yiseArchivedClass;
+package org.firstinspires.ftc.teamcode.yise;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

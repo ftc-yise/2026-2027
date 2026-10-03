@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.archived.yiseArchivedClass;
+package org.firstinspires.ftc.teamcode.yise;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;

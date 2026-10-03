@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.archived;
+package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -24,52 +24,51 @@ import org.firstinspires.ftc.teamcode.yise.Spindexer;
 import org.firstinspires.ftc.teamcode.yise.Turret;
 import org.firstinspires.ftc.teamcode.yise.lifter;
 
-@Autonomous(name = "[RED] Close Shoot Auto", group = "Auto")
-public class RedCloseShootAutoPedroExample extends OpMode {
-    static int X_SHIFT = 4;
-
-    // --- Paths ---
+@Autonomous(name = "[BLUE] Close Shoot Auto", group = "Auto")
+public class BlueCloseShootAuto extends OpMode {
+    // --- Paths --- (coordinates flipped across x = 72 midpoint: newX = 144 - oldX)
     public static class Paths {
         public PathChain[] paths;
         public Paths(Follower follower) {
             paths = new PathChain[4];
 
+            // mirrored from RED: first segment
             paths[0] = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(111.000, 136.000),
-                            new Pose(88.000 - X_SHIFT, 92.000)
-                    )).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(50))
+                            new Pose(33.000, 136.000),
+                            new Pose(60.000, 92.000)
+                    )).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(130))
                     .build();
 
             paths[1] = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(88.000 - X_SHIFT, 92.000),
-                            new Pose(135.90691927512358 - X_SHIFT, 69.50411861614495),
-                            new Pose(135.991 - X_SHIFT, 84.687),
-                            new Pose(135.670 - X_SHIFT, 85.552),
-                            new Pose(128.078 - X_SHIFT, 64.540),
-                            new Pose(118.199 - X_SHIFT, 100.191),
-                            new Pose(83.031 - X_SHIFT, 68.323),
-                            new Pose(82.000 - X_SHIFT, 84.000)
-                    )).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                            new Pose(60.000, 92.000),
+                            new Pose(12.09308072487642, 69.50411861614495),
+                            new Pose(12.009, 84.687),
+                            new Pose(12.33, 85.552),
+                            new Pose(19.922, 64.540),
+                            new Pose(29.801, 100.191),
+                            new Pose(64.969, 68.323),
+                            new Pose(66.000, 84.000)
+                    )).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
                     .build();
 
             paths[2] = follower.pathBuilder()
                     .addPath(new BezierCurve(
-                            new Pose(82.000 - X_SHIFT, 84.000),
-                            new Pose(111.694 - X_SHIFT, 30.730),
-                            new Pose(143.143 - X_SHIFT, 73.264),
-                            new Pose(143.092 - X_SHIFT, 66.909),
-                            new Pose(142.278 - X_SHIFT, 74.143),
-                            new Pose(84.043 - X_SHIFT, 95.196)
-                    )).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+                            new Pose(66.000, 84.000),
+                            new Pose(36.306, 30.730),
+                            new Pose(4.857, 73.264),
+                            new Pose(4.908, 66.909),
+                            new Pose(5.722, 74.143),
+                            new Pose(63.957, 95.196)
+                    )).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
                     .build();
 
             paths[3] = follower.pathBuilder()
                     .addPath(new BezierLine(
-                            new Pose(84.043 - X_SHIFT, 95.196),
-                            new Pose(124.000 - X_SHIFT, 69.000)
-                    )).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+                            new Pose(63.957, 95.196),
+                            new Pose(24.000, 69.000)
+                    )).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
                     .build();
         }
     }
@@ -152,7 +151,7 @@ public class RedCloseShootAutoPedroExample extends OpMode {
         opmodeTimer.resetTimer();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(111, 136, Math.toRadians(180)));
+        follower.setStartingPose(new Pose(33, 136, Math.toRadians(0)));
         paths = new Paths(follower);
 
         intake = hardwareMap.get(DcMotor.class, "intake");
@@ -170,7 +169,7 @@ public class RedCloseShootAutoPedroExample extends OpMode {
         spin = new Spindexer(hardwareMap);
         lifter = new lifter(hardwareMap);
         hood = new Hood(hardwareMap);
-        turret = new Turret(hardwareMap, Turret.turretAlliance.RED, telemetry);
+        turret = new Turret(hardwareMap, Turret.turretAlliance.BLUE, telemetry);
 
         autoShoot = new ShooterExecutionClass(spin, shooter, hardwareMap, lifter);
         patternMgr = new ShotPatternManager();
@@ -438,7 +437,7 @@ public class RedCloseShootAutoPedroExample extends OpMode {
     private void checkFloorSensorsForZoneAndMaybeStartShooting() {
         double rx = follower.getPose().getX();
         double ry = follower.getPose().getY();
-        // coarse inside - keep the original two triangles if desired; here we simply use sensor majority
+        // coarse inside - use sensor majority
         int count = 0;
         if (blc.blue() > ZONE_BLUE_THRESHOLD) count++;
         if (brc.blue() > ZONE_BLUE_THRESHOLD) count++;
