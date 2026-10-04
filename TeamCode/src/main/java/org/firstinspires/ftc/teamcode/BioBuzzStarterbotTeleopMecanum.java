@@ -51,12 +51,7 @@ import org.firstinspires.ftc.teamcode.yise.DriveClass;
 @TeleOp(name = "Mec BioBuzz StarterBot Teleop", group = "StarterBot")
 //@Disabled
 public class BioBuzzStarterbotTeleopMecanum extends OpMode {
-
     // Declare OpMode members.
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
     private DcMotorEx launcher = null;
     private DcMotor intake = null;
     private CRServo leftIntakeServo = null;
@@ -80,16 +75,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
     // Ticks = (RPM/60)*28
     // Ticks/Revolution = 28
 
-    /*
-     * These four variables store the power we need to apply to the motors. In other cases, we may
-     * choose to declare these variables inside the mecanumDrive() function, instead we declare them
-     * here so that we can access them in our main loop for telemetry.
-     */
-    double leftFrontPower;
-    double rightFrontPower;
-    double leftBackPower;
-    double rightBackPower;
-
     // Create a variable to set to the intake.
     double intakePower;
     DriveClass FODrive;
@@ -112,8 +97,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         windmillServo = hardwareMap.get(CRServo.class, "WindmillServo");
         leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntakeServo");
         rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntakeServo");
-
-
 
         /*
          * Here we set our launcher to the RUN_USING_ENCODER runmode.
@@ -167,14 +150,7 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
     @Override
     public void loop() {
         /*
-         * Here we call a function called mecanumDrive. The mecanumDrive function takes the input from
-         * the joysticks, and applies power to the drive motors to move the robot as requested
-         * by the driver. Moving the left joystick forwards/back moves all motors forwards/back,
-         * moving the right joystick left/right rotates the robot clockwise or counterclockwise,
-         * and moving the left joystick left moves the motors in the right way to create a sideways
-         * "strafe" movement. Combinations of these inputs can be used to create more complex maneuvers.
-         * Note, moving the joystick forward on most gamepads results in a negative signal, so
-         * we invert it before passing it to the function.
+         * Call "DriveClass" code to handle Field Oriented Drive.
          */
         FODrive.updateMotors(gamepad1, true);
 
@@ -201,7 +177,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          * change the intake power. So we need to give our launch function a chance to modify the
          * variable before we write it to our motor and servos.
          */
-
         intake.setPower(intakePower);
         leftIntakeServo.setPower(intakePower);
         rightIntakeServo.setPower(intakePower);
@@ -210,7 +185,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          * Show motor powers on the Driver Station via telemetry.
          */
         telemetry.addData(".../", "");
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
         telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
         telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
         telemetry.addData("DriveTelemetry", FODrive.getDriveTelemetry());
@@ -251,6 +225,8 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         } else {
             windmillServo.setPower(0);
         }
+
+        // Let the driver run _only_ the flywheel without activating the windmill
         if (gamepad1.left_bumper) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
