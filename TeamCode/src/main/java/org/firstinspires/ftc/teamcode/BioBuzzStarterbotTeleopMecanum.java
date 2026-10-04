@@ -118,10 +118,11 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         windmillServo.setPower(0);
 
         /*
-         * Much like our drivetrain motors, we set the right intake servo to reverse so that both
+         * Much like our drivetrain motors, we set the left intake servo to REVERSE so that both
          * servos work to pull elements into the intake.
          */
-        rightIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
         windmillServo.setDirection(DcMotorSimple.Direction.FORWARD);
 
         /*
