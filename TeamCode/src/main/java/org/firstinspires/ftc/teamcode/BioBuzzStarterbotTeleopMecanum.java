@@ -22,8 +22,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -32,7 +30,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-// import
 import org.firstinspires.ftc.teamcode.yise.DriveClass;
 
 // init
@@ -77,8 +74,8 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
      * in the launch() function to only run the windmill servo when the motor is spinning fast
      * enough to make a successful throw.
      */
-    public final int LAUNCHER_TARGET_VELOCITY = ((2678/60)*28); //2678 RPM
-    public final int LAUNCHER_MIN_VELOCITY = ((2400/60)*28); //2400 RPM
+    public final int LAUNCHER_TARGET_VELOCITY = ((2678 / 60) * 28); //2678 RPM
+    public final int LAUNCHER_MIN_VELOCITY = ((2400 / 60) * 28); //2400 RPM
     // RPM = (Ticks/28)*60
     // Ticks = (RPM/60)*28
     // Ticks/Revolution = 28
@@ -95,7 +92,8 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
 
     // Create a variable to set to the intake.
     double intakePower;
-DriveClass FODrive;
+    DriveClass FODrive;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -211,10 +209,10 @@ DriveClass FODrive;
         /*
          * Show motor powers on the Driver Station via telemetry.
          */
-        telemetry.addData(".../","");
+        telemetry.addData(".../", "");
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
-        telemetry.addData("Triggers", "left (%.2f, right (%.2f)",gamepad1.left_trigger, gamepad1.right_trigger);
-        telemetry.addData("Flywheel", "RPM: (%.2f)",(launcher.getVelocity()/28)*60);
+        telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
+        telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
         telemetry.addData("DriveTelemetry", FODrive.getDriveTelemetry());
     }
 
@@ -224,6 +222,7 @@ DriveClass FODrive;
     @Override
     public void stop() {
     }
+
     void launch() {
         /*
          * Calling gamepad1.right_bumper returns a boolean which will be true if the bumper is
@@ -252,7 +251,7 @@ DriveClass FODrive;
         } else {
             windmillServo.setPower(0);
         }
-        if (gamepad1.left_bumper){
+        if (gamepad1.left_bumper) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
     }

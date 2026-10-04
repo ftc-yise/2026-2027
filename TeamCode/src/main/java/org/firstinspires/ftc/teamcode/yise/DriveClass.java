@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode.yise;
 
 // import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 
 public class DriveClass {
@@ -20,7 +21,6 @@ public class DriveClass {
     private double t_headingDeg;
     private String t_imureset;
     private Pose2D t_pose;
-
 
 
     private DcMotor leftFrontDrive = null;
@@ -67,7 +67,7 @@ public class DriveClass {
         setBrakeMode(true);
         // set to match hardware mounting of the IMU, conflicting directions will cause code to crash
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
@@ -132,7 +132,7 @@ public class DriveClass {
         } else {
             t_imureset = "Press Y (triangle) on Gamepad to reset\n";
         }
-        if (reverse){
+        if (reverse) {
             directional = -1;
         } else {
             directional = 1;
@@ -164,10 +164,22 @@ public class DriveClass {
         boolean dpadActive = false;
         double dpadX = 0.0;
         double dpadY = 0.0;
-        if (gamepad.dpad_up)    { dpadY = 1.0; dpadActive = true; }
-        if (gamepad.dpad_down)  { dpadY = -1.0; dpadActive = true; }
-        if (gamepad.dpad_right) { dpadX = 1.0; dpadActive = true; }
-        if (gamepad.dpad_left)  { dpadX = -1.0; dpadActive = true; }
+        if (gamepad.dpad_up) {
+            dpadY = 1.0;
+            dpadActive = true;
+        }
+        if (gamepad.dpad_down) {
+            dpadY = -1.0;
+            dpadActive = true;
+        }
+        if (gamepad.dpad_right) {
+            dpadX = 1.0;
+            dpadActive = true;
+        }
+        if (gamepad.dpad_left) {
+            dpadX = -1.0;
+            dpadActive = true;
+        }
 
         double tx_field = dpadActive ? dpadX : shapedX; // field-frame translation x (strafe)
         double ty_field = dpadActive ? dpadY : shapedY; // field-frame translation y (forward)
@@ -201,10 +213,16 @@ public class DriveClass {
             // normalize if necessary
             double max = Math.max(1.0, Math.max(Math.abs(lf), Math.max(Math.abs(rf),
                     Math.max(Math.abs(lb), Math.abs(rb)))));
-            lf /= max; rf /= max; lb /= max; rb /= max;
+            lf /= max;
+            rf /= max;
+            lb /= max;
+            rb /= max;
 
             // scale per currentSpeed
-            lf *= currentSpeed; rf *= currentSpeed; lb *= currentSpeed; rb *= currentSpeed;
+            lf *= currentSpeed;
+            rf *= currentSpeed;
+            lb *= currentSpeed;
+            rb *= currentSpeed;
 
             // ramp-up-only smoothing (instant down)
             lf = applyRampUpAndCap(lastLF, lf, accelRate, absStepCap);
@@ -234,10 +252,10 @@ public class DriveClass {
             leftBackDrive.setPower(lb);
             rightBackDrive.setPower(rb);
         } else {
-            double leftFrontPower  = rawY + rawX - rawTurn;
+            double leftFrontPower = rawY + rawX - rawTurn;
             double rightFrontPower = rawY - rawX + rawTurn;
-            double leftBackPower   = rawY - rawX - rawTurn;
-            double rightBackPower  = rawY + rawX + rawTurn;
+            double leftBackPower = rawY - rawX - rawTurn;
+            double rightBackPower = rawY + rawX + rawTurn;
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower * currentSpeed);
@@ -246,7 +264,10 @@ public class DriveClass {
             rightBackDrive.setPower(rightBackPower * currentSpeed);
         }
         // update last applied powers
-        lastLF = lf; lastRF = rf; lastLB = lb; lastRB = rb;
+        lastLF = lf;
+        lastRF = rf;
+        lastLB = lb;
+        lastRB = rb;
 
         // set brake mode when no input requested
         boolean anyInput = (Math.abs(dbX) > 0.0001) || (Math.abs(dbY) > 0.0001) || (Math.abs(dbTurn) > 0.0001) || dpadActive;
@@ -274,13 +295,14 @@ public class DriveClass {
 
     }
 
-    public void setAutoPower(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower){
+    public void setAutoPower(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
         // Send calculated power to wheels
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
     }
+
     //telemetry
     public static class DriveTelemetry {
         public double rawX, rawY, rawTurn;
