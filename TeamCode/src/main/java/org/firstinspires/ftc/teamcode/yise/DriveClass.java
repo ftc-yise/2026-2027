@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-
 
 public class DriveClass {
     // Telemetry output variables
@@ -48,11 +48,11 @@ public class DriveClass {
     private boolean xPreviouslyPressed = false;
     private boolean runmodeFieldorientation = false;
 
-    private IMU imu = null;
+    private GoBildaPinpointDriver odo;
 
     public DriveClass(HardwareMap hardwareMap) {
         // hardware map
-        imu = hardwareMap.get(IMU.class, "imu");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
 
         leftFrontDrive = hardwareMap.get(DcMotor.class, "LeftFrontDrive");
         leftBackDrive = hardwareMap.get(DcMotor.class, "LeftBackDrive");
@@ -65,18 +65,7 @@ public class DriveClass {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         setBrakeMode(true);
-        // set to match hardware mounting of the IMU, conflicting directions will cause code to crash
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-        // Now initialize the IMU with this mounting orientation
-        // Note: if you choose two conflicting directions, this initialization will cause a code exception.
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-
-        imu.resetYaw(); // not sure if this works, updated from imu.resetTracking();
-        // Pose2D pose = imu.getPosition(); previously initiated the otos, doesn't seem like IMU needs a call
+        odo.resetPosAndIMU();
     }
 
     public void handleSpeedToggle(Gamepad gamepad) {
@@ -124,25 +113,42 @@ public class DriveClass {
         rightBackDrive.setZeroPowerBehavior(mode);
     }
 
+    public void frontRightForward() {
+        rightFrontDrive.setPower(1);
+    }
+    public void backRightForward() {
+        rightBackDrive.setPower(1);
+    }
+    public void backLeftForward() {
+        leftBackDrive.setPower(1);
+    }
+    public void frontLeftForward() {
+        leftFrontDrive.setPower(1);
+    }
+    public void resetDebug(){
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
+    }
+
     public void updateMotors(Gamepad gamepad, boolean reverse) {
         double directional = 1;
+        if (reverse) {
+            directional = -1;
+        }
+
         if (gamepad.b) {
             t_imureset = "Resetting\n";
-            imu.resetYaw();
+            odo.recalibrateIMU();
         } else {
             t_imureset = "Press Y (triangle) on Gamepad to reset\n";
         }
-        if (reverse) {
-            directional = -1;
-        } else {
-            directional = 1;
-        }
 
-        // read the angle of the robot (updating for IMU instead of otos)
-        // Pose2D pose = imu.getPosition(); (redundant)
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        double pose = orientation.getYaw();
-        double headingDeg = orientation.getYaw(); //uses orientation to pull the yaw
+        // read the angle of the robot
+        odo.update();
+        Pose2D pose = odo.getPosition();
+        double headingDeg = pose.getHeading(AngleUnit.DEGREES); //uses orientation to pull the yaw
         double headingRad = Math.toRadians(headingDeg);
 
         // read raw inputs
@@ -291,7 +297,7 @@ public class DriveClass {
         t_rb = rb;
 
         t_headingDeg = headingDeg;
-        double t_pose = pose;
+        Pose2D t_pose = pose;
 
     }
 
