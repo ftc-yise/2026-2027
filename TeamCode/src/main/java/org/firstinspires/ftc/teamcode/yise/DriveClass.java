@@ -140,9 +140,9 @@ public class DriveClass {
 
         if (gamepad.b) {
             t_imureset = "Resetting\n";
-            odo.recalibrateIMU();
+            odo.resetPosAndIMU();
         } else {
-            t_imureset = "Press Y (triangle) on Gamepad to reset\n";
+            t_imureset = "Press B (circle) on Gamepad to reset\n";
         }
 
         // read the angle of the robot
