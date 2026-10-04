@@ -4,10 +4,12 @@ package org.firstinspires.ftc.teamcode.yise;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+
 
 public class DriveClass {
     // Telemetry output variables
@@ -16,6 +18,7 @@ public class DriveClass {
     private double t_robotX, t_robotY;
     private double t_lf, t_rf, t_lb, t_rb;
     private double t_headingDeg;
+    private String t_imureset;
     private Pose2D t_pose;
 
 
@@ -62,6 +65,15 @@ public class DriveClass {
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         setBrakeMode(true);
+        // set to match hardware mounting of the IMU, conflicting directions will cause code to crash
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+        // Now initialize the IMU with this mounting orientation
+        // Note: if you choose two conflicting directions, this initialization will cause a code exception.
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         imu.resetYaw(); // not sure if this works, updated from imu.resetTracking();
         // Pose2D pose = imu.getPosition(); previously initiated the otos, doesn't seem like IMU needs a call
@@ -114,7 +126,12 @@ public class DriveClass {
 
     public void updateMotors(Gamepad gamepad, boolean reverse) {
         double directional = 1;
-
+        if (gamepad.b) {
+            t_imureset = "Resetting\n";
+            imu.resetYaw();
+        } else {
+            t_imureset = "Press Y (triangle) on Gamepad to reset\n";
+        }
         if (reverse){
             directional = -1;
         } else {
@@ -271,6 +288,7 @@ public class DriveClass {
         public double robotX, robotY;
         public double lf, rf, lb, rb;
         public double headingDeg;
+        public String imureset;
         public Pose2D pose;
 
         public double currentSpeed;
@@ -281,6 +299,8 @@ public class DriveClass {
         d.rawX = t_rawX;
         d.rawY = t_rawY;
         d.rawTurn = t_rawTurn;
+
+        d.imureset = t_imureset;
 
         d.tx_field = t_txField;
         d.ty_field = t_tyField;

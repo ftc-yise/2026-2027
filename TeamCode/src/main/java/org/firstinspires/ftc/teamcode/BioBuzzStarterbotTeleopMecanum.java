@@ -215,6 +215,7 @@ DriveClass FODrive;
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
         telemetry.addData("Triggers", "left (%.2f, right (%.2f)",gamepad1.left_trigger, gamepad1.right_trigger);
         telemetry.addData("Flywheel", "RPM: (%.2f)",(launcher.getVelocity()/28)*60);
+        telemetry.addData("DriveTelemetry", FODrive.getDriveTelemetry());
     }
 
     /*
