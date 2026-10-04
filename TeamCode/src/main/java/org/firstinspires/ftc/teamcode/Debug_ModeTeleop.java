@@ -48,7 +48,7 @@ import org.firstinspires.ftc.teamcode.yise.DriveClass;
  * we will also need to adjust the "PIDF" coefficients with some that are a better fit for our application.
  */
 
-@TeleOp(name = "Mec BioBuzz StarterBot Teleop", group = "StarterBot")
+@TeleOp(name = "Mec BioBuzz Debug Teleop", group = "StarterBot")
 //@Disabled
 public class Debug_ModeTeleop extends OpMode {
     // Declare OpMode members.
