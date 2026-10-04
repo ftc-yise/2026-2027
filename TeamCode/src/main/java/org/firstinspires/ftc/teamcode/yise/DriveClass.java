@@ -318,7 +318,7 @@ public class DriveClass {
         public double headingDeg;
         public String imureset;
         public Pose2D pose;
-
+        public String mode;
         public double currentSpeed;
     }
 
@@ -346,6 +346,7 @@ public class DriveClass {
         d.pose = t_pose;
 
         d.currentSpeed = currentSpeed;
+        d.mode = runmodeFieldorientation ? "field": "driver";
 
         return d;
     }
