@@ -109,11 +109,11 @@ DriveClass FODrive;
          * step.
          */
 
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        launcher = hardwareMap.get(DcMotorEx.class, "launcher");
-        windmillServo = hardwareMap.get(CRServo.class, "windmillServo");
-        leftIntakeServo = hardwareMap.get(CRServo.class, "leftIntakeServo");
-        rightIntakeServo = hardwareMap.get(CRServo.class, "rightIntakeServo");
+        intake = hardwareMap.get(DcMotor.class, "Intake");
+        launcher = hardwareMap.get(DcMotorEx.class, "Launcher");
+        windmillServo = hardwareMap.get(CRServo.class, "WindmillServo");
+        leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntakeServo");
+        rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntakeServo");
 
 
 
@@ -224,33 +224,6 @@ DriveClass FODrive;
     @Override
     public void stop() {
     }
-
-    void mecanumDrive(double forward, double strafe, double rotate) {
-        leftFrontPower = forward + strafe + rotate;
-        rightFrontPower = forward - strafe - rotate;
-        leftBackPower = forward - strafe + rotate;
-        rightBackPower = forward + strafe - rotate;
-
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        /*
-         * Send calculated power to wheels
-         */
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
-    }
-
     void launch() {
         /*
          * Calling gamepad1.right_bumper returns a boolean which will be true if the bumper is
