@@ -77,9 +77,11 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
      * in the launch() function to only run the windmill servo when the motor is spinning fast
      * enough to make a successful throw.
      */
-    public final int LAUNCHER_TARGET_VELOCITY = 1250; //2678 RPM
-    public final int LAUNCHER_MIN_VELOCITY = 1200; //2571 RPM
-
+    public final int LAUNCHER_TARGET_VELOCITY = ((2678/60)*28); //2678 RPM
+    public final int LAUNCHER_MIN_VELOCITY = ((2400/60)*28); //2400 RPM
+    // RPM = (Ticks/28)*60
+    // Ticks = (RPM/60)*28
+    // Ticks/Revolution = 28
 
     /*
      * These four variables store the power we need to apply to the motors. In other cases, we may
@@ -139,7 +141,7 @@ DriveClass FODrive;
          * servos work to pull elements into the intake.
          */
         rightIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
-        windmillServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        windmillServo.setDirection(DcMotorSimple.Direction.FORWARD);
 
         /*
          * Tell the driver that initialization is complete.
@@ -209,8 +211,10 @@ DriveClass FODrive;
         /*
          * Show motor powers on the Driver Station via telemetry.
          */
+        telemetry.addData(".../","");
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
         telemetry.addData("Triggers", "left (%.2f, right (%.2f)",gamepad1.left_trigger, gamepad1.right_trigger);
+        telemetry.addData("Flywheel", "RPM: (%.2f)",(launcher.getVelocity()/28)*60);
     }
 
     /*
@@ -273,6 +277,9 @@ DriveClass FODrive;
             intakePower += 0.5;
         } else {
             windmillServo.setPower(0);
+        }
+        if (gamepad1.left_bumper){
+            launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
     }
 }
