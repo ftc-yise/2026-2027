@@ -64,6 +64,12 @@ public class DriveClass {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        odo.setOffsets(-164.0, -184.0, DistanceUnit.MM);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
+        // idk if we need this or not
+        // odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        // We need to add setposition(); to track robot coordinates according to FTC guidelines, with 0,0 being the center of the FTC field. Appropriate offsets and heading are included in the Pinpoint User Guide PDF.
+
         setBrakeMode(true);
         odo.resetPosAndIMU();
     }
