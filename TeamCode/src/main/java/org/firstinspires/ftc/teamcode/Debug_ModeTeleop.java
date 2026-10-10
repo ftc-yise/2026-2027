@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.yise.DriveClass;
 
 // init
@@ -154,6 +155,7 @@ public class Debug_ModeTeleop extends OpMode {
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
         FODrive.updateMotors(gamepad1, true);
+        FODrive.handleSpeedToggle(gamepad1);
         if (gamepad1.dpad_up){
             FODrive.frontRightForward();
         }
@@ -203,7 +205,23 @@ public class Debug_ModeTeleop extends OpMode {
         telemetry.addData(".../", "");
         telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
         telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
-        telemetry.addData("DriveTelemetry", FODrive.getDriveTelemetry());
+        DriveClass.DriveTelemetry driveTel = FODrive.getDriveTelemetry();
+        telemetry.addData("drivemode", driveTel.mode);
+        telemetry.addData("rawY", driveTel.rawY);
+        telemetry.addData("rawTurn", driveTel.rawTurn);
+        telemetry.addData("tx_field", driveTel.tx_field);
+        telemetry.addData("ty_field", driveTel.ty_field);
+        telemetry.addData("rotationCmd", driveTel.rotationCmd);
+        telemetry.addData("robotX", driveTel.robotX);
+        telemetry.addData("robotY", driveTel.robotY);
+        telemetry.addData("lf", driveTel.lf);
+        telemetry.addData("rf", driveTel.rf);
+        telemetry.addData("lb", driveTel.lb);
+        telemetry.addData("rb", driveTel.rb);
+        telemetry.addData("headingDeg", driveTel.headingDeg);
+        telemetry.addData("poseY", driveTel.pose.getY(DistanceUnit.MM));
+        telemetry.addData("poseX", driveTel.pose.getX(DistanceUnit.MM));
+        telemetry.addData("currentSpeed", driveTel.currentSpeed);
     }
 
     /*

@@ -192,7 +192,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
         DriveClass.DriveTelemetry driveTel = FODrive.getDriveTelemetry();
         telemetry.addData("drivemode", driveTel.mode);
-        telemetry.addData("imuReset", driveTel.imureset);
         telemetry.addData("rawY", driveTel.rawY);
         telemetry.addData("rawTurn", driveTel.rawTurn);
         telemetry.addData("tx_field", driveTel.tx_field);
