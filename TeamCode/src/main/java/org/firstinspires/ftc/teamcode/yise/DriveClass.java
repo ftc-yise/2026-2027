@@ -37,7 +37,7 @@ public class DriveClass {
     private double lastLF = 0.0, lastRF = 0.0, lastLB = 0.0, lastRB = 0.0;
 
     // turn override threshold
-    private double turnOverrideThreshold = 0.25;
+    private double turnOverrideThreshold = 0.5; // changed from 0.25
 
     // debounce helper for Y toggle
     private boolean yPreviouslyPressed = false;
@@ -206,7 +206,7 @@ public class DriveClass {
         // TURN OVERRIDE: if driver asks for a strong turn, spin in place and skip the mixing math
         double lf, rf, lb, rb;
         if (Math.abs(rawTurn) > turnOverrideThreshold) {
-            double turnPower = rawTurn; // allow raw (no shaping) or use shapedTurn if you prefer
+            double turnPower = rawTurn *= currentSpeed; // allow raw (no shaping) or use shapedTurn if you prefer
             lf = -turnPower;
             rf = turnPower;
             lb = -turnPower;
@@ -286,8 +286,8 @@ public class DriveClass {
         t_rawY = rawY;
         t_rawTurn = rawTurn;
 
-        t_txField = tx_field;
-        t_tyField = ty_field;
+        t_txField += tx_field;
+        t_tyField += ty_field;
         t_rotationCmd = rotationCmd;
 
         t_robotX = robotX;
@@ -299,7 +299,7 @@ public class DriveClass {
         t_rb = rb;
 
         t_headingDeg = headingDeg;
-        Pose2D t_pose = pose;
+        t_pose = pose;
 
     }
 
@@ -353,6 +353,3 @@ public class DriveClass {
         return d;
     }
 }
-
-
-
