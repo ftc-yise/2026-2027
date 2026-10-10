@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.yise.DriveClass;
 
@@ -154,8 +155,8 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         /*
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
-        FODrive.updateMotors(gamepad1, true);
-
+        FODrive.updateMotors(gamepad1, false);
+        FODrive.handleSpeedToggle(gamepad1);
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
          * Each trigger outputs a signal from 0-1, with 0 as fully released, and 1 fully depressed.
@@ -204,7 +205,8 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         telemetry.addData("lb", driveTel.lb);
         telemetry.addData("rb", driveTel.rb);
         telemetry.addData("headingDeg", driveTel.headingDeg);
-        telemetry.addData("pose", driveTel.pose);
+        telemetry.addData("poseY", driveTel.pose.getY(DistanceUnit.MM));
+        telemetry.addData("poseX", driveTel.pose.getX(DistanceUnit.MM));
         telemetry.addData("currentSpeed", driveTel.currentSpeed);
 
     }
