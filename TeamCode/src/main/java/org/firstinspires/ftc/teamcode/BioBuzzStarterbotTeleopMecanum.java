@@ -22,8 +22,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -32,6 +30,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.yise.DriveClass;
+
+// init
 /*
  * This file includes a teleop (driver-controlled) file for the goBILDA® StarterBot with Mecanum
  * Wheels for the 2026-2027 FIRST® Tech Challenge. On top of a mecanum wheel drivetrain, it uses
@@ -50,12 +53,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 @TeleOp(name = "Mec BioBuzz StarterBot Teleop", group = "StarterBot")
 //@Disabled
 public class BioBuzzStarterbotTeleopMecanum extends OpMode {
-
     // Declare OpMode members.
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
     private DcMotorEx launcher = null;
     private DcMotor intake = null;
     private CRServo leftIntakeServo = null;
@@ -73,24 +71,15 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
      * in the launch() function to only run the windmill servo when the motor is spinning fast
      * enough to make a successful throw.
      */
-    public final int LAUNCHER_TARGET_VELOCITY = ((2678/60)*28); //2678 RPM
-    public final int LAUNCHER_MIN_VELOCITY = ((2400/60)*28); //2400 RPM
+    public final int LAUNCHER_TARGET_VELOCITY = ((2678 / 60) * 28); //2678 RPM
+    public final int LAUNCHER_MIN_VELOCITY = ((2400 / 60) * 28); //2400 RPM
     // RPM = (Ticks/28)*60
     // Ticks = (RPM/60)*28
     // Ticks/Revolution = 28
 
-    /*
-     * These four variables store the power we need to apply to the motors. In other cases, we may
-     * choose to declare these variables inside the mecanumDrive() function, instead we declare them
-     * here so that we can access them in our main loop for telemetry.
-     */
-    double leftFrontPower;
-    double rightFrontPower;
-    double leftBackPower;
-    double rightBackPower;
-
     // Create a variable to set to the intake.
     double intakePower;
+    DriveClass FODrive;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -98,43 +87,18 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
     @Override
     public void init() {
 
+        FODrive = new DriveClass(hardwareMap);
         /*
          * Initialize the hardware variables. Note that the strings used here as parameters
          * to 'get' must correspond to the names assigned during the robot configuration
          * step.
          */
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "frontLeft");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRight");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "backLeft");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "backRight");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        launcher = hardwareMap.get(DcMotorEx.class, "launcher");
-        windmillServo = hardwareMap.get(CRServo.class, "windmill");
-        leftIntakeServo = hardwareMap.get(CRServo.class, "intakeLeft");
-        rightIntakeServo = hardwareMap.get(CRServo.class, "intakeRight");
 
-        /*
-         * To drive forward, most robots need the motor on one side to be reversed,
-         * because the axles point in opposite directions. Pushing the left stick forward
-         * MUST make robot go forward. So adjust these two lines based on your first test drive.
-         * Note: The settings here assume direct drive on left and right wheels. Gear
-         * Reduction or 90 Deg drives may require direction flips
-         */
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-
-        /*
-         * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
-         * slow down much faster when it is coasting. This creates a much more controllable
-         * drivetrain. As the robot stops much quicker.
-         */
-        leftFrontDrive.setZeroPowerBehavior(BRAKE);
-        rightFrontDrive.setZeroPowerBehavior(BRAKE);
-        leftBackDrive.setZeroPowerBehavior(BRAKE);
-        rightBackDrive.setZeroPowerBehavior(BRAKE);
-        intake.setZeroPowerBehavior(BRAKE);
+        intake = hardwareMap.get(DcMotor.class, "Intake");
+        launcher = hardwareMap.get(DcMotorEx.class, "Launcher");
+        windmillServo = hardwareMap.get(CRServo.class, "WindmillServo");
+        leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntakeServo");
+        rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntakeServo");
 
         /*
          * Here we set our launcher to the RUN_USING_ENCODER runmode.
@@ -156,10 +120,11 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         windmillServo.setPower(0);
 
         /*
-         * Much like our drivetrain motors, we set the right intake servo to reverse so that both
+         * Much like our drivetrain motors, we set the left intake servo to REVERSE so that both
          * servos work to pull elements into the intake.
          */
-        rightIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightIntakeServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftIntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
         windmillServo.setDirection(DcMotorSimple.Direction.FORWARD);
 
         /*
@@ -188,17 +153,10 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
     @Override
     public void loop() {
         /*
-         * Here we call a function called mecanumDrive. The mecanumDrive function takes the input from
-         * the joysticks, and applies power to the drive motors to move the robot as requested
-         * by the driver. Moving the left joystick forwards/back moves all motors forwards/back,
-         * moving the right joystick left/right rotates the robot clockwise or counterclockwise,
-         * and moving the left joystick left moves the motors in the right way to create a sideways
-         * "strafe" movement. Combinations of these inputs can be used to create more complex maneuvers.
-         * Note, moving the joystick forward on most gamepads results in a negative signal, so
-         * we invert it before passing it to the function.
+         * Call "DriveClass" code to handle Field Oriented Drive.
          */
-        mecanumDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-
+        FODrive.updateMotors(gamepad1, false);
+        FODrive.handleSpeedToggle(gamepad1);
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
          * Each trigger outputs a signal from 0-1, with 0 as fully released, and 1 fully depressed.
@@ -222,7 +180,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          * change the intake power. So we need to give our launch function a chance to modify the
          * variable before we write it to our motor and servos.
          */
-
         intake.setPower(intakePower);
         leftIntakeServo.setPower(intakePower);
         rightIntakeServo.setPower(intakePower);
@@ -230,10 +187,27 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         /*
          * Show motor powers on the Driver Station via telemetry.
          */
-        telemetry.addData(".../","");
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftFrontPower, rightFrontPower);
-        telemetry.addData("Triggers", "left (%.2f, right (%.2f)",gamepad1.left_trigger, gamepad1.right_trigger);
-        telemetry.addData("Flywheel", "RPM: (%.2f)",(launcher.getVelocity()/28)*60);
+        telemetry.addData(".../", "");
+        telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
+        telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
+        DriveClass.DriveTelemetry driveTel = FODrive.getDriveTelemetry();
+        telemetry.addData("drivemode", driveTel.mode);
+        telemetry.addData("rawY", driveTel.rawY);
+        telemetry.addData("rawTurn", driveTel.rawTurn);
+        telemetry.addData("tx_field", driveTel.tx_field);
+        telemetry.addData("ty_field", driveTel.ty_field);
+        telemetry.addData("rotationCmd", driveTel.rotationCmd);
+        telemetry.addData("robotX", driveTel.robotX);
+        telemetry.addData("robotY", driveTel.robotY);
+        telemetry.addData("lf", driveTel.lf);
+        telemetry.addData("rf", driveTel.rf);
+        telemetry.addData("lb", driveTel.lb);
+        telemetry.addData("rb", driveTel.rb);
+        telemetry.addData("headingDeg", driveTel.headingDeg);
+        telemetry.addData("poseY", driveTel.pose.getY(DistanceUnit.MM));
+        telemetry.addData("poseX", driveTel.pose.getX(DistanceUnit.MM));
+        telemetry.addData("currentSpeed", driveTel.currentSpeed);
+
     }
 
     /*
@@ -241,32 +215,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
      */
     @Override
     public void stop() {
-    }
-
-    void mecanumDrive(double forward, double strafe, double rotate) {
-        leftFrontPower = forward + strafe + rotate;
-        rightFrontPower = forward - strafe - rotate;
-        leftBackPower = forward - strafe + rotate;
-        rightBackPower = forward + strafe - rotate;
-
-        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        /*
-         * Send calculated power to wheels
-         */
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
     }
 
     void launch() {
@@ -297,7 +245,9 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         } else {
             windmillServo.setPower(0);
         }
-        if (gamepad1.left_bumper){
+
+        // Let the driver run _only_ the flywheel without activating the windmill
+        if (gamepad1.left_bumper) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
     }
