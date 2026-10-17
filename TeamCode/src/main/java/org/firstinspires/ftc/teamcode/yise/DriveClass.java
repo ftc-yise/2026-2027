@@ -42,7 +42,7 @@ public class DriveClass {
     // debounce helper for Y toggle
     private boolean yPreviouslyPressed = false;
     private boolean xPreviouslyPressed = false;
-    private boolean runmodeFieldorientation = false;
+    private boolean runmodeFieldorientation = true;
 
     private GoBildaPinpointDriver odo;
 
