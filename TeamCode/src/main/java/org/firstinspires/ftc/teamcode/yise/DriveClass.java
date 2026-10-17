@@ -206,7 +206,7 @@ public class DriveClass {
         // TURN OVERRIDE: if driver asks for a strong turn, spin in place and skip the mixing math
         double lf, rf, lb, rb;
         if (Math.abs(rawTurn) > turnOverrideThreshold) {
-            double turnPower = rawTurn *= currentSpeed; // allow raw (no shaping) or use shapedTurn if you prefer
+            double turnPower = rawTurn * currentSpeed; // allow raw (no shaping) or use shapedTurn if you prefer
             lf = -turnPower;
             rf = turnPower;
             lb = -turnPower;
