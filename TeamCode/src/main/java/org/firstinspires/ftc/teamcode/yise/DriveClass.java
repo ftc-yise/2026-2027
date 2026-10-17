@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.yise;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -42,7 +43,7 @@ public class DriveClass {
     // debounce helper for Y toggle
     private boolean yPreviouslyPressed = false;
     private boolean xPreviouslyPressed = false;
-    private boolean runmodeFieldorientation = true;
+    private boolean runmodeFieldorientation = false;
 
     private GoBildaPinpointDriver odo;
 
@@ -118,16 +119,20 @@ public class DriveClass {
     public void frontRightForward() {
         rightFrontDrive.setPower(1);
     }
+
     public void backRightForward() {
         rightBackDrive.setPower(1);
     }
+
     public void backLeftForward() {
         leftBackDrive.setPower(1);
     }
+
     public void frontLeftForward() {
         leftFrontDrive.setPower(1);
     }
-    public void resetDebug(){
+
+    public void resetDebug() {
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
@@ -260,6 +265,11 @@ public class DriveClass {
             leftBackDrive.setPower(lb);
             rightBackDrive.setPower(rb);
         } else {
+            // read raw inputs
+            rawX = gamepad.left_stick_x * -directional;    // strafe
+            rawY = -gamepad.left_stick_y * -directional;  // forward positive
+            rawTurn = -gamepad.right_stick_x * directional; // rotation (driver)
+
             double leftFrontPower = rawY + rawX - rawTurn;
             double rightFrontPower = rawY - rawX + rawTurn;
             double leftBackPower = rawY - rawX - rawTurn;
@@ -348,7 +358,7 @@ public class DriveClass {
         d.pose = t_pose;
 
         d.currentSpeed = currentSpeed;
-        d.mode = runmodeFieldorientation ? "field": "driver";
+        d.mode = runmodeFieldorientation ? "field" : "driver";
 
         return d;
     }
