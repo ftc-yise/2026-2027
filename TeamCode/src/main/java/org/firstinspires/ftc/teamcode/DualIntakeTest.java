@@ -1,0 +1,127 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+@TeleOp(name="DualIntakeTest", group="Linear OpMode")
+public class DualIntakeTest extends LinearOpMode {
+
+    // Declare OpMode members for each of the 4 motors.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor rightBackDrive = null;
+    private DcMotor FrontIntake = null;
+    private DcMotor rearIntake = null;
+
+    private double currentSpeed = 1;
+
+
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize the hardware variables. Note that the strings used here must correspond
+        // to the names assigned during the robot configuration step on the DS or RC devices.
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "LeftFrontDrive");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "LeftBackDrive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "RightFrontDrive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "RightBackDrive");
+        FrontIntake = hardwareMap.get(DcMotor.class, "FrontIntake");
+        rearIntake = hardwareMap.get(DcMotor.class, "RearIntake");
+
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        double forward = 0;  // Note: pushing stick forward gives negative value
+        double strafe = 0;
+        double turn = 0;
+
+        waitForStart();
+        runtime.reset();
+
+
+        // run until the end of the match (driver presses STOP)
+        while (opModeIsActive()) {
+            double max;
+
+            if (gamepad1.dpad_down) {
+                forward   = 0.5;
+            } else if (gamepad1.dpad_up) {
+                forward   = -0.5;
+            } else if (gamepad1.dpad_left) {
+                strafe = -0.5;
+            } else if (gamepad1.dpad_right) {
+                strafe = 0.5;
+            } else {
+                // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+                forward = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+                strafe = gamepad1.left_stick_x;
+                turn = -gamepad1.right_stick_x * 0.5;
+            }
+
+                // Combine the joystick requests for each axis-motion to determine each wheel's power.
+                // Set up a variable for each drive wheel to save the power level for telemetry.
+                double leftFrontPower = -forward - strafe + turn;
+                double rightFrontPower = -forward + strafe - turn;
+                double leftBackPower = -forward + strafe + turn;
+                double rightBackPower = -forward - strafe - turn;
+
+            if (gamepad1.right_trigger > 0.75){
+                rearIntake.setPower(0.75);
+                FrontIntake.setPower(0.75);
+            } else if (gamepad1.left_trigger > 0.75){
+                FrontIntake.setPower(-0.75);
+                rearIntake.setPower(-0.75);
+            } else {
+                FrontIntake.setPower(0);
+                rearIntake.setPower(0);
+            }
+
+            if(gamepad1.a){
+                leftBackDrive.setPower(0.5);
+                telemetry.addLine("left back - current");
+                telemetry.addLine("left back - a");
+                telemetry.addLine("right back - B");
+                telemetry.addLine("left front - x");
+                telemetry.addLine("Right front - Y");
+
+            } else if (gamepad1.b) {
+                telemetry.addLine("right back - current");
+                telemetry.addLine("left back - a");
+                telemetry.addLine("right back - B");
+                telemetry.addLine("left front - x");
+                telemetry.addLine("Right front - Y");
+                rightBackDrive.setPower(0.5);
+            }else if (gamepad1.x) {
+                telemetry.addLine("left front - current");
+                telemetry.addLine("left back - a");
+                telemetry.addLine("right back - B");
+                telemetry.addLine("left front - x");
+                telemetry.addLine("Right front - Y");
+                leftFrontDrive.setPower(0.5);
+            }else if (gamepad1.y) {
+                telemetry.addLine("right front - current");
+                telemetry.addLine("left back - a");
+                telemetry.addLine("right back - B");
+                telemetry.addLine("left front - x");
+                telemetry.addLine("Right front - Y");
+                rightFrontDrive.setPower(0.5);
+            } else {
+                telemetry.addLine("left back - a");
+                telemetry.addLine("right back - B");
+                telemetry.addLine("left front - x");
+                telemetry.addLine("Right front - Y");
+                // Send calculated power to wheels
+                leftFrontDrive.setPower(leftFrontPower * currentSpeed);
+                rightFrontDrive.setPower(rightFrontPower * currentSpeed);
+                leftBackDrive.setPower(leftBackPower * currentSpeed);
+                rightBackDrive.setPower(rightBackPower * currentSpeed);
+            }
+            telemetry.update();
+        }
+    }}
