@@ -207,7 +207,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         telemetry.addData("poseY", driveTel.pose.getY(DistanceUnit.MM));
         telemetry.addData("poseX", driveTel.pose.getX(DistanceUnit.MM));
         telemetry.addData("currentSpeed", driveTel.currentSpeed);
-
     }
 
     /*
@@ -241,7 +240,6 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          */
         if (gamepad1.right_bumper && launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
             windmillServo.setPower(1);
-            intakePower += 0.5;
         } else {
             windmillServo.setPower(0);
         }
