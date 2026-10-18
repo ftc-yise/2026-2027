@@ -154,21 +154,21 @@ public class Debug_ModeTeleop extends OpMode {
         /*
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
-        FODrive.updateMotors(gamepad1, true);
+        FODrive.updateMotors(gamepad1, false);
         FODrive.handleSpeedToggle(gamepad1);
-        if (gamepad1.dpad_up){
+        if (gamepad1.dpad_up) {
             FODrive.frontRightForward();
         }
-        if (gamepad1.dpad_right){
+        if (gamepad1.dpad_right) {
             FODrive.backRightForward();
         }
-        if (gamepad1.dpad_down){
+        if (gamepad1.dpad_down) {
             FODrive.backLeftForward();
         }
-        if (gamepad1.dpad_left){
+        if (gamepad1.dpad_left) {
             FODrive.frontLeftForward();
         }
-        if (!gamepad1.dpad_up && !gamepad1.dpad_right && !gamepad1.dpad_down && !gamepad1.dpad_left){
+        if (!gamepad1.dpad_up && !gamepad1.dpad_right && !gamepad1.dpad_down && !gamepad1.dpad_left) {
             FODrive.resetDebug();
         }
 

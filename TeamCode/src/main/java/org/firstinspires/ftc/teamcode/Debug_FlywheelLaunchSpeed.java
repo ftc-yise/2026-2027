@@ -61,6 +61,8 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
 
     private boolean dpadupPreviouslyPressed;
     private boolean dpaddownPreviouslyPressed;
+    private boolean dpadleftPreviouslyPressed;
+    private boolean dpadrightPreviouslyPressed;
     /*
      * These two variables are used to control the velocity of the launcher motor.
      * They are both in encoder ticks per second. The motors we use in the FIRST Tech Challenge
@@ -73,7 +75,8 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
      */
     public int LAUNCHER_TARGET_VELOCITY = ((2600 / 60) * 28); //2600 RPM
     private int launcherTargetRPM = 2600;
-    public final int LAUNCHER_MIN_VELOCITY = ((2400 / 60) * 28); //2400 RPM
+    private int launcherMinRPM = 2400;
+    public int LAUNCHER_MIN_VELOCITY = ((2400 / 60) * 28); //2400 RPM
     // RPM = (Ticks/28)*60
     // Ticks = (RPM/60)*28
     // Ticks/Revolution = 28
@@ -156,12 +159,12 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         /*
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
-        FODrive.updateMotors(gamepad1, true);
+        FODrive.updateMotors(gamepad1, false);
         FODrive.handleSpeedToggle(gamepad1);
         if (gamepad1.dpad_up && !dpadupPreviouslyPressed) {
             dpadupPreviouslyPressed = true;
             if (launcherTargetRPM < 6000) {
-                launcherTargetRPM += 100;
+                launcherTargetRPM += 25;
                 LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
         } else if (!gamepad1.dpad_up) {
@@ -170,13 +173,29 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         if (gamepad1.dpad_down && !dpaddownPreviouslyPressed) {
             dpaddownPreviouslyPressed = true;
             if (launcherTargetRPM > 0) {
-               launcherTargetRPM -= 100;
+               launcherTargetRPM -= 25;
                 LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
         } else if (!gamepad1.dpad_down) {
             dpaddownPreviouslyPressed = false;
 
         }
+        ////
+        if (gamepad1.dpad_left && !dpadleftPreviouslyPressed) {
+            dpadleftPreviouslyPressed = true;
+            if (launcherMinRPM < launcherTargetRPM-15) {
+                launcherMinRPM -= 15;
+            }
+        } else if (!gamepad1.dpad_left) {
+            dpadleftPreviouslyPressed = false;
+        }
+        if (gamepad1.dpad_right && !dpadrightPreviouslyPressed) {
+            dpadrightPreviouslyPressed = true;
+            launcherMinRPM += 15;
+        } else if (!gamepad1.dpad_right) {
+            dpadrightPreviouslyPressed = false;
+        }
+        LAUNCHER_MIN_VELOCITY = ((launcherTargetRPM-launcherMinRPM / 60) * 28);
 
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
@@ -208,6 +227,9 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         /*
          * Show motor powers on the Driver Station via telemetry.
          */
+        telemetry.addData("Desired RPM: ", launcherTargetRPM);
+        telemetry.addData("Minimum RPM: ", launcherMinRPM);
+        telemetry.addData("", "");
         telemetry.addData(".../", "");
         telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
         telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
@@ -261,7 +283,6 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
          */
         if (gamepad1.right_bumper) {
             windmillServo.setPower(1);
-            intakePower += 0.5;
         } else {
             windmillServo.setPower(0);
         }

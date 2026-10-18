@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.yise;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -118,16 +119,20 @@ public class DriveClass {
     public void frontRightForward() {
         rightFrontDrive.setPower(1);
     }
+
     public void backRightForward() {
         rightBackDrive.setPower(1);
     }
+
     public void backLeftForward() {
         leftBackDrive.setPower(1);
     }
+
     public void frontLeftForward() {
         leftFrontDrive.setPower(1);
     }
-    public void resetDebug(){
+
+    public void resetDebug() {
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
@@ -206,7 +211,7 @@ public class DriveClass {
         // TURN OVERRIDE: if driver asks for a strong turn, spin in place and skip the mixing math
         double lf, rf, lb, rb;
         if (Math.abs(rawTurn) > turnOverrideThreshold) {
-            double turnPower = rawTurn *= currentSpeed; // allow raw (no shaping) or use shapedTurn if you prefer
+            double turnPower = rawTurn * currentSpeed; // allow raw (no shaping) or use shapedTurn if you prefer
             lf = -turnPower;
             rf = turnPower;
             lb = -turnPower;
@@ -260,6 +265,11 @@ public class DriveClass {
             leftBackDrive.setPower(lb);
             rightBackDrive.setPower(rb);
         } else {
+            // read raw inputs
+            rawX = gamepad.left_stick_x * -directional;    // strafe
+            rawY = -gamepad.left_stick_y * -directional;  // forward positive
+            rawTurn = -gamepad.right_stick_x * directional; // rotation (driver)
+
             double leftFrontPower = rawY + rawX - rawTurn;
             double rightFrontPower = rawY - rawX + rawTurn;
             double leftBackPower = rawY - rawX - rawTurn;
@@ -348,7 +358,7 @@ public class DriveClass {
         d.pose = t_pose;
 
         d.currentSpeed = currentSpeed;
-        d.mode = runmodeFieldorientation ? "field": "driver";
+        d.mode = runmodeFieldorientation ? "field" : "driver";
 
         return d;
     }
