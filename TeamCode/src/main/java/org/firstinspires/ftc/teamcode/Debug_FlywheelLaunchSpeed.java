@@ -72,6 +72,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
      * enough to make a successful throw.
      */
     public int LAUNCHER_TARGET_VELOCITY = ((2600 / 60) * 28); //2600 RPM
+    private int launcherTargetRPM = 2600;
     public final int LAUNCHER_MIN_VELOCITY = ((2400 / 60) * 28); //2400 RPM
     // RPM = (Ticks/28)*60
     // Ticks = (RPM/60)*28
@@ -159,16 +160,18 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         FODrive.handleSpeedToggle(gamepad1);
         if (gamepad1.dpad_up && !dpadupPreviouslyPressed) {
             dpadupPreviouslyPressed = true;
-            if (LAUNCHER_TARGET_VELOCITY < 6000) {
-                LAUNCHER_TARGET_VELOCITY += 100;
+            if (launcherTargetRPM < 6000) {
+                launcherTargetRPM += 100;
+                LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
         } else if (!gamepad1.dpad_up) {
             dpadupPreviouslyPressed = false;
         }
         if (gamepad1.dpad_down && !dpaddownPreviouslyPressed) {
             dpaddownPreviouslyPressed = true;
-            if (LAUNCHER_TARGET_VELOCITY > 0) {
-                LAUNCHER_TARGET_VELOCITY -= 100;
+            if (launcherTargetRPM > 0) {
+               launcherTargetRPM -= 100;
+                LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
         } else if (!gamepad1.dpad_down) {
             dpaddownPreviouslyPressed = false;
