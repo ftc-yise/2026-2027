@@ -59,7 +59,8 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
     private CRServo rightIntakeServo = null;
     private CRServo windmillServo = null;
 
-
+    private boolean dpadupPreviouslyPressed;
+    private boolean dpaddownPreviouslyPressed;
     /*
      * These two variables are used to control the velocity of the launcher motor.
      * They are both in encoder ticks per second. The motors we use in the FIRST Tech Challenge
@@ -156,17 +157,23 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
          */
         FODrive.updateMotors(gamepad1, true);
         FODrive.handleSpeedToggle(gamepad1);
-        if (gamepad1.dpad_up) {
+        if (gamepad1.dpad_up && !dpadupPreviouslyPressed) {
+            dpadupPreviouslyPressed = true;
             if (LAUNCHER_TARGET_VELOCITY < 6000) {
                 LAUNCHER_TARGET_VELOCITY += 100;
             }
+        } else if (!gamepad1.dpad_up) {
+            dpadupPreviouslyPressed = false;
         }
-        if (gamepad1.dpad_down) {
+        if (gamepad1.dpad_down && !dpaddownPreviouslyPressed) {
+            dpaddownPreviouslyPressed = true;
             if (LAUNCHER_TARGET_VELOCITY > 0) {
                 LAUNCHER_TARGET_VELOCITY -= 100;
             }
-        }
+        } else if (!gamepad1.dpad_down) {
+            dpaddownPreviouslyPressed = false;
 
+        }
 
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
