@@ -59,7 +59,8 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
     private CRServo rightIntakeServo = null;
     private CRServo windmillServo = null;
 
-
+    private boolean dpadupPreviouslyPressed;
+    private boolean dpaddownPreviouslyPressed;
     /*
      * These two variables are used to control the velocity of the launcher motor.
      * They are both in encoder ticks per second. The motors we use in the FIRST Tech Challenge
@@ -71,6 +72,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
      * enough to make a successful throw.
      */
     public int LAUNCHER_TARGET_VELOCITY = ((2600 / 60) * 28); //2600 RPM
+    private int launcherTargetRPM = 2600;
     public final int LAUNCHER_MIN_VELOCITY = ((2400 / 60) * 28); //2400 RPM
     // RPM = (Ticks/28)*60
     // Ticks = (RPM/60)*28
@@ -156,17 +158,25 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
          */
         FODrive.updateMotors(gamepad1, true);
         FODrive.handleSpeedToggle(gamepad1);
-        if (gamepad1.dpad_up) {
-            if (LAUNCHER_TARGET_VELOCITY < 6000) {
-                LAUNCHER_TARGET_VELOCITY += 100;
+        if (gamepad1.dpad_up && !dpadupPreviouslyPressed) {
+            dpadupPreviouslyPressed = true;
+            if (launcherTargetRPM < 6000) {
+                launcherTargetRPM += 100;
+                LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
+        } else if (!gamepad1.dpad_up) {
+            dpadupPreviouslyPressed = false;
         }
-        if (gamepad1.dpad_down) {
-            if (LAUNCHER_TARGET_VELOCITY > 0) {
-                LAUNCHER_TARGET_VELOCITY -= 100;
+        if (gamepad1.dpad_down && !dpaddownPreviouslyPressed) {
+            dpaddownPreviouslyPressed = true;
+            if (launcherTargetRPM > 0) {
+               launcherTargetRPM -= 100;
+                LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
-        }
+        } else if (!gamepad1.dpad_down) {
+            dpaddownPreviouslyPressed = false;
 
+        }
 
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
