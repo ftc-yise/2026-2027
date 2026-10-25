@@ -72,21 +72,21 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
      * enough to make a successful throw.
      */
     public final int LAUNCHER_TARGET_VELOCITY = ((2725 / 60) * 28);
-    public final int LAUNCHER_MIN_VELOCITY = ((2655 / 60) * 28);
+    public final int LAUNCHER_MIN_VELOCITY = ((2640 / 60) * 28); // used to be 2655
     // RPM = (Ticks/28)*60
     // Ticks = (RPM/60)*28
     // Ticks/Revolution = 28
     // Create a variable to set to the intake.
     double intakePower;
     DriveClass FODrive;
-
+    DriveClass.DriveTelemetry driveTel;
     /*
      * Code to run ONCE when the driver hits INIT
      */
     @Override
     public void init() {
-
         FODrive = new DriveClass(hardwareMap);
+        driveTel = FODrive.getDriveTelemetry();
         /*
          * Initialize the hardware variables. Note that the strings used here as parameters
          * to 'get' must correspond to the names assigned during the robot configuration
@@ -186,26 +186,25 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         /*
          * Show motor powers on the Driver Station via telemetry.
          */
-        telemetry.addData(".../", "");
-        telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
+        //telemetry.addData(".../", "");
+        //telemetry.addData("Triggers", "left (%.2f, right (%.2f)", gamepad1.left_trigger, gamepad1.right_trigger);
+        //telemetry.addData("rawY", driveTel.rawY);
+        //telemetry.addData("rawTurn", driveTel.rawTurn);
+        //telemetry.addData("tx_field", driveTel.tx_field);
+        //telemetry.addData("ty_field", driveTel.ty_field);
+        //telemetry.addData("rotationCmd", driveTel.rotationCmd);
+        //telemetry.addData("robotX", driveTel.robotX);
+        //telemetry.addData("robotY", driveTel.robotY);
+        //telemetry.addData("lf", driveTel.lf);
+        //telemetry.addData("rf", driveTel.rf);
+        //telemetry.addData("lb", driveTel.lb);
+        //telemetry.addData("rb", driveTel.rb);
         telemetry.addData("Flywheel", "RPM: (%.2f)", (launcher.getVelocity() / 28) * 60);
-        DriveClass.DriveTelemetry driveTel = FODrive.getDriveTelemetry();
-        telemetry.addData("drivemode", driveTel.mode);
-        telemetry.addData("rawY", driveTel.rawY);
-        telemetry.addData("rawTurn", driveTel.rawTurn);
-        telemetry.addData("tx_field", driveTel.tx_field);
-        telemetry.addData("ty_field", driveTel.ty_field);
-        telemetry.addData("rotationCmd", driveTel.rotationCmd);
-        telemetry.addData("robotX", driveTel.robotX);
-        telemetry.addData("robotY", driveTel.robotY);
-        telemetry.addData("lf", driveTel.lf);
-        telemetry.addData("rf", driveTel.rf);
-        telemetry.addData("lb", driveTel.lb);
-        telemetry.addData("rb", driveTel.rb);
-        telemetry.addData("headingDeg", driveTel.headingDeg);
-        telemetry.addData("poseY", driveTel.pose.getY(DistanceUnit.MM));
-        telemetry.addData("poseX", driveTel.pose.getX(DistanceUnit.MM));
-        telemetry.addData("currentSpeed", driveTel.currentSpeed);
+        telemetry.addData("Drive Mode: ", driveTel.mode);
+        telemetry.addData("Drive Speed: ", driveTel.currentSpeed);
+        telemetry.addData("X Pos: ", driveTel.pose.getX(DistanceUnit.MM));
+        telemetry.addData("Y Pos: ", driveTel.pose.getY(DistanceUnit.MM));
+        telemetry.addData("Rotation (Deg): ", driveTel.headingDeg);
     }
 
     /*
@@ -226,6 +225,9 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          */
         if (gamepad1.right_bumper || gamepad2.right_bumper) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
+        } else if(gamepad2.right_trigger_pressed) {
+            launcher.setVelocity(-0.5*LAUNCHER_TARGET_VELOCITY);
+            windmillServo.setPower(-1);
         } else {
             launcher.setVelocity(0);
         }
@@ -237,15 +239,10 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          * add some power to the intake power. This can sometimes help dislodge stuck elements from
          * inside the hopper.
          */
-        if (gamepad1.right_bumper && launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
+        if ((gamepad1.right_bumper || gamepad2.right_bumper) && launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
             windmillServo.setPower(1);
         } else {
             windmillServo.setPower(0);
-        }
-
-        // Let the driver run _only_ the flywheel without activating the windmill
-        if (gamepad1.left_bumper) {
-            launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         }
     }
 }

@@ -38,7 +38,7 @@ public class DriveClass {
     private double lastLF = 0.0, lastRF = 0.0, lastLB = 0.0, lastRB = 0.0;
 
     // turn override threshold
-    private double turnOverrideThreshold = 0.5; // changed from 0.25
+    private double turnOverrideThreshold = 0.24; // changed from 0.25
 
     // debounce helper for Y toggle
     private boolean yPreviouslyPressed = false;
@@ -69,6 +69,7 @@ public class DriveClass {
 
         setBrakeMode(true);
         odo.resetPosAndIMU();
+        t_pose = odo.getPosition();
     }
 
     public void handleSpeedToggle(Gamepad gamepad) {
@@ -129,7 +130,23 @@ public class DriveClass {
     }
 
     public void frontLeftForward() {
-        leftFrontDrive.setPower(1);
+        leftFrontDrive.setPower(-1);
+    }
+
+    public void frontRightBackward() {
+        rightFrontDrive.setPower(-1);
+    }
+
+    public void backRightBackward() {
+        rightBackDrive.setPower(-1);
+    }
+
+    public void backLeftBackward() {
+        leftBackDrive.setPower(-1);
+    }
+
+    public void frontLeftBackward() {
+        leftFrontDrive.setPower(-1);
     }
 
     public void resetDebug() {
@@ -161,7 +178,7 @@ public class DriveClass {
         // read raw inputs
         double rawX = gamepad.left_stick_x * directional;    // strafe
         double rawY = -gamepad.left_stick_y * directional;  // forward positive
-        double rawTurn = -gamepad.right_stick_x * directional; // rotation (driver)
+        double rawTurn = 0.45 * (-gamepad.right_stick_x * directional); // rotation (driver)
 
         // deadbands to remove stick drift
         double dbX = applyDeadband(rawX, transDeadband);
@@ -211,11 +228,11 @@ public class DriveClass {
         // TURN OVERRIDE: if driver asks for a strong turn, spin in place and skip the mixing math
         double lf, rf, lb, rb;
         if (Math.abs(rawTurn) > turnOverrideThreshold) {
-            double turnPower = rawTurn * currentSpeed; // allow raw (no shaping) or use shapedTurn if you prefer
-            lf = -turnPower;
-            rf = turnPower;
-            lb = -turnPower;
-            rb = turnPower;
+            // double turnPower = rawTurn; // allow raw (no shaping) or use shapedTurn if you prefer
+            lf = -rawTurn;
+            rf = rawTurn;
+            lb = -rawTurn;
+            rb = rawTurn;
         } else {
             // standard mecanum mix (robot-frame)
             lf = robotY + robotX + rotationCmd;
@@ -268,7 +285,7 @@ public class DriveClass {
             // read raw inputs
             rawX = gamepad.left_stick_x * -directional;    // strafe
             rawY = -gamepad.left_stick_y * -directional;  // forward positive
-            rawTurn = -gamepad.right_stick_x * directional; // rotation (driver)
+            rawTurn = 0.45 * (-gamepad.right_stick_x * directional); // rotation (driver)
 
             double leftFrontPower = rawY + rawX - rawTurn;
             double rightFrontPower = rawY - rawX + rawTurn;
