@@ -81,7 +81,7 @@ public class KitbotShoot extends OpMode {
         telemetry.addData("Resetting Powers", null);
         resetPowers();
         telemetry.addData("Moving From Wall", null);
-        AU.moveDir(AutoUtils.forward, 250);
+        AU.moveDir(AutoUtils.backward, 250);
         telemetry.addData("Finished Auto.", null);
     }
     void launch() {

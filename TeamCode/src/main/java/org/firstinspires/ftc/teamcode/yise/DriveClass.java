@@ -129,9 +129,7 @@ public class DriveClass {
         leftBackDrive.setPower(1);
     }
 
-    public void frontLeftForward() {
-        leftFrontDrive.setPower(-1);
-    }
+    public void frontLeftForward() {leftFrontDrive.setPower(1);}
 
     public void frontRightBackward() {
         rightFrontDrive.setPower(-1);

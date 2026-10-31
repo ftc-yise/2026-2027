@@ -15,21 +15,21 @@ public class AutoUtils {
     public void moveDir(String dir, int time) {
         FODrive.stopAllMotors();
         if (dir.equals(right)) {
-            FODrive.frontRightForward();
-            FODrive.frontLeftForward();
-            FODrive.backRightBackward();
-            FODrive.backLeftBackward();
-        } else if (dir.equals(left)) {
-            FODrive.frontRightBackward();
             FODrive.frontLeftBackward();
-            FODrive.backRightForward();
-            FODrive.backLeftForward();
-        } else if (dir.equals(forward)) {
-            FODrive.frontLeftForward();
             FODrive.frontRightForward();
             FODrive.backLeftForward();
+            FODrive.backRightBackward();
+        } else if (dir.equals(left)) {
+            FODrive.frontLeftForward();
+            FODrive.frontRightBackward();
+            FODrive.backLeftBackward();
             FODrive.backRightForward();
         } else if (dir.equals(backward)) {
+            FODrive.frontLeftForward();
+            FODrive.frontRightForward();
+            FODrive.backLeftForward();
+            FODrive.backRightForward();
+        } else if (dir.equals(forward)) {
             FODrive.frontLeftBackward();
             FODrive.frontRightBackward();
             FODrive.backLeftBackward();
