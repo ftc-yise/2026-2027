@@ -49,22 +49,22 @@ public class DriveClass {
 
     public DriveClass(HardwareMap hardwareMap) {
         // hardware map
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "Pinpoint");
 
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "LeftFrontDrive");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "LeftBackDrive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "RightFrontDrive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "RightBackDrive");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "FrontLeft");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "BackLeft");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "FrontRight");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "BackRight");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        odo.setOffsets(-164.0, -184.0, DistanceUnit.MM);
+        odo.setOffsets(184.0, -164.0, DistanceUnit.MM);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         // idk if we need this or not
-        // odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         // We need to add setposition(); to track robot coordinates according to FTC guidelines, with 0,0 being the center of the FTC field. Appropriate offsets and heading are included in the Pinpoint User Guide PDF.
 
         setBrakeMode(true);
@@ -118,33 +118,33 @@ public class DriveClass {
     }
 
     public void frontRightForward() {
-        rightFrontDrive.setPower(1);
-    }
-
-    public void backRightForward() {
-        rightBackDrive.setPower(1);
-    }
-
-    public void backLeftForward() {
-        leftBackDrive.setPower(1);
-    }
-
-    public void frontLeftForward() {leftFrontDrive.setPower(1);}
-
-    public void frontRightBackward() {
         rightFrontDrive.setPower(-1);
     }
 
-    public void backRightBackward() {
+    public void backRightForward() {
         rightBackDrive.setPower(-1);
     }
 
-    public void backLeftBackward() {
+    public void backLeftForward() {
         leftBackDrive.setPower(-1);
     }
 
+    public void frontLeftForward() {leftFrontDrive.setPower(-1);}
+
+    public void frontRightBackward() {
+        rightFrontDrive.setPower(1);
+    }
+
+    public void backRightBackward() {
+        rightBackDrive.setPower(1);
+    }
+
+    public void backLeftBackward() {
+        leftBackDrive.setPower(1);
+    }
+
     public void frontLeftBackward() {
-        leftFrontDrive.setPower(-1);
+        leftFrontDrive.setPower(1);
     }
 
     public void resetDebug() {
@@ -161,10 +161,7 @@ public class DriveClass {
         }
 
         if (gamepad.b) {
-            t_imureset = "Resetting\n";
             odo.resetPosAndIMU();
-        } else {
-            t_imureset = "Press B (circle) on Gamepad to reset\n";
         }
 
         // read the angle of the robot
@@ -280,9 +277,7 @@ public class DriveClass {
             leftBackDrive.setPower(lb);
             rightBackDrive.setPower(rb);
         } else {
-            // read raw inputs
-            rawX = gamepad.left_stick_x * -directional;    // strafe
-            rawY = -gamepad.left_stick_y * -directional;  // forward positive
+            // Reduce drive speed
             rawTurn = 0.45 * (-gamepad.right_stick_x * directional); // rotation (driver)
 
             double leftFrontPower = rawY + rawX - rawTurn;
@@ -354,8 +349,6 @@ public class DriveClass {
         d.rawX = t_rawX;
         d.rawY = t_rawY;
         d.rawTurn = t_rawTurn;
-
-        d.imureset = t_imureset;
 
         d.tx_field = t_txField;
         d.ty_field = t_tyField;

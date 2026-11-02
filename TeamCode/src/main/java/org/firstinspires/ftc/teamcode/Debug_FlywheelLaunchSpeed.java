@@ -100,9 +100,9 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
 
         intake = hardwareMap.get(DcMotor.class, "Intake");
         launcher = hardwareMap.get(DcMotorEx.class, "Launcher");
-        windmillServo = hardwareMap.get(CRServo.class, "WindmillServo");
-        leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntakeServo");
-        rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntakeServo");
+        windmillServo = hardwareMap.get(CRServo.class, "Windmill");
+        leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntake");
+        rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntake");
 
         /*
          * Here we set our launcher to the RUN_USING_ENCODER runmode.
@@ -159,7 +159,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         /*
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
-        FODrive.updateMotors(gamepad1, false);
+        FODrive.updateMotors(gamepad1,true);
         FODrive.handleSpeedToggle(gamepad1);
         if (gamepad1.dpad_up && !dpadupPreviouslyPressed) {
             dpadupPreviouslyPressed = true;

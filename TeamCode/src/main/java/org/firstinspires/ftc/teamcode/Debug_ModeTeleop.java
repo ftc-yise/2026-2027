@@ -95,9 +95,9 @@ public class Debug_ModeTeleop extends OpMode {
 
         intake = hardwareMap.get(DcMotor.class, "Intake");
         launcher = hardwareMap.get(DcMotorEx.class, "Launcher");
-        windmillServo = hardwareMap.get(CRServo.class, "WindmillServo");
-        leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntakeServo");
-        rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntakeServo");
+        windmillServo = hardwareMap.get(CRServo.class, "Windmill");
+        leftIntakeServo = hardwareMap.get(CRServo.class, "LeftIntake");
+        rightIntakeServo = hardwareMap.get(CRServo.class, "RightIntake");
 
         /*
          * Here we set our launcher to the RUN_USING_ENCODER runmode.
