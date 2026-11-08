@@ -156,7 +156,7 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
         FODrive.updateMotors(gamepad1, false);
-        FODrive.getDriveTelemetry();
+        driveTel = FODrive.getDriveTelemetry();
         FODrive.handleSpeedToggle(gamepad1);
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
