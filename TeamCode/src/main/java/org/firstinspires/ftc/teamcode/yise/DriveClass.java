@@ -87,6 +87,7 @@ public class DriveClass {
         return Math.abs(val) > threshold ? val : 0.0;
     }
 
+    @SuppressWarnings("ConstantValue")
     private double shape(double v) {
         if (stickExpo == 1.0) return v;
         double s = Math.signum(v);
@@ -267,6 +268,8 @@ public class DriveClass {
         t_pose = pose;
     }
 
+
+    @Deprecated
     public void setAutoPower(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
         // Send calculated power to wheels
         leftFrontDrive.setPower(leftFrontPower);
