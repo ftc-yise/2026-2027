@@ -16,9 +16,11 @@ public class Test_and_DemoOpmode extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor intake = null;
 
-    private double currentSpeed = 1;
+    private double currentSpeed = 0.5;
 
+    double intakePower;
 
 
     @Override
@@ -30,6 +32,7 @@ public class Test_and_DemoOpmode extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "LeftBackDrive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "RightFrontDrive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "RightBackDrive");
+        intake = hardwareMap.get(DcMotor.class,"IntakeMotor");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -44,19 +47,23 @@ public class Test_and_DemoOpmode extends LinearOpMode {
             double max;
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double forward   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double strafe =  gamepad1.left_stick_x;
+            double forward = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double strafe = gamepad1.left_stick_x;
             double turn = 0;
-            if (Math.abs(gamepad1.right_stick_x) > 0.4) turn =  gamepad1.right_stick_x;
+            if (Math.abs(gamepad1.right_stick_x) > 0.4) turn = gamepad1.right_stick_x;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = -forward - strafe + turn;
-            double rightFrontPower = -forward + strafe - turn;
-            double leftBackPower   = -forward + strafe + turn;
-            double rightBackPower  = -forward - strafe - turn;
+            double leftFrontPower = -forward - strafe - turn * currentSpeed;
+            double rightFrontPower = -forward + strafe + turn * currentSpeed;
+            double leftBackPower = -forward + strafe - turn * currentSpeed;
+            double rightBackPower = -forward - strafe + turn * currentSpeed;
 
-            if(gamepad1.a){
+            intakePower = gamepad1.right_trigger - gamepad1.left_trigger;
+            double clamped = Math.min(0.65, (Math.max(-0.65, intakePower)));
+            intake.setPower(clamped);
+
+            if (gamepad1.a) {
                 leftBackDrive.setPower(0.5);
                 telemetry.addLine("left back - current");
                 telemetry.addLine("left back - a");
@@ -71,20 +78,25 @@ public class Test_and_DemoOpmode extends LinearOpMode {
                 telemetry.addLine("left front - x");
                 telemetry.addLine("Right front - Y");
                 rightBackDrive.setPower(0.5);
-            }else if (gamepad1.x) {
+            } else if (gamepad1.x) {
                 telemetry.addLine("left front - current");
                 telemetry.addLine("left back - a");
                 telemetry.addLine("right back - B");
                 telemetry.addLine("left front - x");
                 telemetry.addLine("Right front - Y");
                 leftFrontDrive.setPower(0.5);
-            }else if (gamepad1.y) {
+            } else if (gamepad1.y) {
                 telemetry.addLine("right front - current");
                 telemetry.addLine("left back - a");
                 telemetry.addLine("right back - B");
                 telemetry.addLine("left front - x");
                 telemetry.addLine("Right front - Y");
                 rightFrontDrive.setPower(0.5);
+            } else if (gamepad1.dpad_up) {
+                // i didnt wanna store previous/do debounce so we get this thing
+                currentSpeed = 1;
+            } else if (gamepad1.dpad_down) {
+                currentSpeed = 0.5;
             } else {
                 telemetry.addLine("left back - a");
                 telemetry.addLine("right back - B");
