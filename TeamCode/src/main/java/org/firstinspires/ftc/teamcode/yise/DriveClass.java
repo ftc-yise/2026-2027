@@ -4,48 +4,42 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class DriveClass {
     // Telemetry output variables
-    private double t_rawX, t_rawY, t_rawTurn;
-    private double t_txField, t_tyField, t_rotationCmd;
-    private double t_robotX, t_robotY;
+    private double t_rawXInput, t_rawYInput, t_rawTurnInput;
+    private double t_shapedXInput, t_shapedYInput, t_shapedTurnInput;
+    private double t_finalXDirection, t_finalYDirection;
     private double t_lf, t_rf, t_lb, t_rb;
-    private double t_headingDeg;
-    private String t_imureset;
     private Pose2D t_pose;
 
 
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
+    private final DcMotor leftFrontDrive;
+    private final DcMotor leftBackDrive;
+    private final DcMotor rightFrontDrive;
+    private final DcMotor rightBackDrive;
 
-    private double fullSpeed = 1.0;
-    private double slowSpeed = 0.45;
+    private static final double fullSpeed = 1.0;
+    private static final double slowSpeed = 0.45;
     private double currentSpeed = fullSpeed;
 
-    private double transDeadband = 0.06;
-    private double rotDeadband = 0.08;
-    private double stickExpo = 3.0;
+    private static final double transDeadband = 0.06;
+    private static final double rotDeadband = 0.08;
+    private static final double stickExpo = 3.0;
 
-    private double accelRate = 0.06;
-    private double absStepCap = 0.40;
+    private static final double accelRate = 0.06;
+    private static final double absStepCap = 0.40;
     private double lastLF = 0.0, lastRF = 0.0, lastLB = 0.0, lastRB = 0.0;
 
     // turn override threshold
-    private double turnOverrideThreshold = 0.24; // changed from 0.25
+    private static final double turnOverrideThreshold = 0.24; // changed from 0.25
 
     // debounce helper for Y toggle
     private boolean yPreviouslyPressed = false;
-    private boolean xPreviouslyPressed = false;
-    private boolean runmodeFieldorientation = false;
-
-    private GoBildaPinpointDriver odo;
+    private final GoBildaPinpointDriver odo;
 
     public DriveClass(HardwareMap hardwareMap) {
         // hardware map
@@ -63,7 +57,7 @@ public class DriveClass {
 
         odo.setOffsets(184.0, -164.0, DistanceUnit.MM);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
-        // idk if we need this or not
+
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         // We need to add setposition(); to track robot coordinates according to FTC guidelines, with 0,0 being the center of the FTC field. Appropriate offsets and heading are included in the Pinpoint User Guide PDF.
 
@@ -92,20 +86,20 @@ public class DriveClass {
         return Math.abs(val) > threshold ? val : 0.0;
     }
 
-    private double shape(double v, double expo) {
-        if (expo == 1.0) return v;
+    private double shape(double v) {
+        if (stickExpo == 1.0) return v;
         double s = Math.signum(v);
-        return s * Math.pow(Math.abs(v), expo);
+        return s * Math.pow(Math.abs(v), stickExpo);
     }
 
-    private double applyRampUpAndCap(double last, double target, double accel, double absCap) {
+    private double applyRampUpAndCap(double last, double target) {
         if (Math.abs(target) < Math.abs(last)) {
             // instant down (aggressive stop)
             return target;
         }
         double delta = target - last;
-        double step = Math.signum(delta) * Math.min(Math.abs(delta), accel);
-        if (Math.abs(step) > absCap) step = Math.signum(step) * absCap;
+        double step = Math.signum(delta) * Math.min(Math.abs(delta), accelRate);
+        if (Math.abs(step) > absStepCap) step = Math.signum(step) * absStepCap;
         return last + step;
     }
 
@@ -129,7 +123,9 @@ public class DriveClass {
         leftBackDrive.setPower(-1);
     }
 
-    public void frontLeftForward() {leftFrontDrive.setPower(-1);}
+    public void frontLeftForward() {
+        leftFrontDrive.setPower(-1);
+    }
 
     public void frontRightBackward() {
         rightFrontDrive.setPower(1);
@@ -167,73 +163,44 @@ public class DriveClass {
         // read the angle of the robot
         odo.update();
         Pose2D pose = odo.getPosition();
-        double headingDeg = pose.getHeading(AngleUnit.DEGREES); //uses orientation to pull the yaw
-        double headingRad = Math.toRadians(headingDeg);
+        double headingRad = pose.getHeading(AngleUnit.RADIANS); //uses orientation to pull the yaw
 
         // read raw inputs
-        double rawX = gamepad.left_stick_x * directional;    // strafe
-        double rawY = -gamepad.left_stick_y * directional;  // forward positive
-        double rawTurn = 0.45 * (-gamepad.right_stick_x * directional); // rotation (driver)
+        double rawXInput = gamepad.left_stick_x * directional;    // strafe
+        double rawYInput = -gamepad.left_stick_y * directional;  // forward positive
+        double rawTurnInput = 0.45 * (-gamepad.right_stick_x * directional); // rotation (driver)
 
         // deadbands to remove stick drift
-        double dbX = applyDeadband(rawX, transDeadband);
-        double dbY = applyDeadband(rawY, transDeadband);
-        double dbTurn = applyDeadband(rawTurn, rotDeadband);
+        double dbX = applyDeadband(rawXInput, transDeadband);
+        double dbY = applyDeadband(rawYInput, transDeadband);
+        double dbTurn = applyDeadband(rawTurnInput, rotDeadband);
 
         // shaping
-        double shapedX = shape(dbX, stickExpo);
-        double shapedY = shape(dbY, stickExpo);
-        double shapedTurn = shape(dbTurn, stickExpo);
-
-        // D-Pad override (perfect unit vectors) - ignore sticks entirely when any dpad pressed
-        boolean dpadActive = false;
-        double dpadX = 0.0;
-        double dpadY = 0.0;
-        if (gamepad.dpad_up) {
-            dpadY = 1.0;
-            dpadActive = true;
-        }
-        if (gamepad.dpad_down) {
-            dpadY = -1.0;
-            dpadActive = true;
-        }
-        if (gamepad.dpad_right) {
-            dpadX = 1.0;
-            dpadActive = true;
-        }
-        if (gamepad.dpad_left) {
-            dpadX = -1.0;
-            dpadActive = true;
-        }
-
-        double tx_field = dpadActive ? dpadX : shapedX; // field-frame translation x (strafe)
-        double ty_field = dpadActive ? dpadY : shapedY; // field-frame translation y (forward)
-
-        // rotation command is driver only (no assist here)
-        double rotationCmd = shapedTurn;
-        if (dpadActive) rotationCmd = 0.0; // disable turning while D-pad linear mode is active
+        double shapedXInput = shape(dbX);
+        double shapedYInput = shape(dbY);
+        double shapedTurnInput = shape(dbTurn);
 
         // field->robot transform (robot-relative commands)
         // rotate the field vector by -heading to produce robot-relative motion
         double cosH = Math.cos(-headingRad);
         double sinH = Math.sin(-headingRad);
-        double robotX = tx_field * cosH - ty_field * sinH;
-        double robotY = tx_field * sinH + ty_field * cosH;
+        double finalXDirection = shapedXInput * cosH - shapedYInput * sinH;
+        double finalYDirection = shapedXInput * sinH + shapedYInput * cosH;
 
         // TURN OVERRIDE: if driver asks for a strong turn, spin in place and skip the mixing math
         double lf, rf, lb, rb;
-        if (Math.abs(rawTurn) > turnOverrideThreshold) {
-            // double turnPower = rawTurn; // allow raw (no shaping) or use shapedTurn if you prefer
-            lf = -rawTurn;
-            rf = rawTurn;
-            lb = -rawTurn;
-            rb = rawTurn;
+        if (Math.abs(rawTurnInput) > turnOverrideThreshold) {
+            // double turnPower = rawTurnInput; // allow raw (no shaping) or use shapedTurnInput if you prefer
+            lf = -rawTurnInput;
+            rf = rawTurnInput;
+            lb = -rawTurnInput;
+            rb = rawTurnInput;
         } else {
             // standard mecanum mix (robot-frame)
-            lf = robotY + robotX + rotationCmd;
-            rf = robotY - robotX - rotationCmd;
-            lb = robotY - robotX + rotationCmd;
-            rb = robotY + robotX - rotationCmd;
+            lf = finalYDirection + finalXDirection + shapedTurnInput;
+            rf = finalYDirection - finalXDirection - shapedTurnInput;
+            lb = finalYDirection - finalXDirection + shapedTurnInput;
+            rb = finalYDirection + finalXDirection - shapedTurnInput;
 
             // normalize if necessary
             double max = Math.max(1.0, Math.max(Math.abs(lf), Math.max(Math.abs(rf),
@@ -250,10 +217,10 @@ public class DriveClass {
             rb *= currentSpeed;
 
             // ramp-up-only smoothing (instant down)
-            lf = applyRampUpAndCap(lastLF, lf, accelRate, absStepCap);
-            rf = applyRampUpAndCap(lastRF, rf, accelRate, absStepCap);
-            lb = applyRampUpAndCap(lastLB, lb, accelRate, absStepCap);
-            rb = applyRampUpAndCap(lastRB, rb, accelRate, absStepCap);
+            lf = applyRampUpAndCap(lastLF, lf);
+            rf = applyRampUpAndCap(lastRF, rf);
+            lb = applyRampUpAndCap(lastLB, lb);
+            rb = applyRampUpAndCap(lastRB, rb);
         }
 
         // small output deadband
@@ -263,34 +230,12 @@ public class DriveClass {
         if (Math.abs(lb) < outputDeadband) lb = 0.0;
         if (Math.abs(rb) < outputDeadband) rb = 0.0;
 
-        // set motor powers
-        if (gamepad.x && !xPreviouslyPressed) {
-            runmodeFieldorientation = !runmodeFieldorientation;
-            xPreviouslyPressed = true;
-        } else if (!gamepad.x) {
-            xPreviouslyPressed = false;
-        }
+        // setting motor powers
+        leftFrontDrive.setPower(lf);
+        rightFrontDrive.setPower(rf);
+        leftBackDrive.setPower(lb);
+        rightBackDrive.setPower(rb);
 
-        if (runmodeFieldorientation) {
-            leftFrontDrive.setPower(lf);
-            rightFrontDrive.setPower(rf);
-            leftBackDrive.setPower(lb);
-            rightBackDrive.setPower(rb);
-        } else {
-            // Reduce drive speed
-            rawTurn = 0.45 * (-gamepad.right_stick_x * directional); // rotation (driver)
-
-            double leftFrontPower = rawY + rawX - rawTurn;
-            double rightFrontPower = rawY - rawX + rawTurn;
-            double leftBackPower = rawY - rawX - rawTurn;
-            double rightBackPower = rawY + rawX + rawTurn;
-
-            // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower * currentSpeed);
-            rightFrontDrive.setPower(rightFrontPower * currentSpeed);
-            leftBackDrive.setPower(leftBackPower * currentSpeed);
-            rightBackDrive.setPower(rightBackPower * currentSpeed);
-        }
         // update last applied powers
         lastLF = lf;
         lastRF = rf;
@@ -298,29 +243,27 @@ public class DriveClass {
         lastRB = rb;
 
         // set brake mode when no input requested
-        boolean anyInput = (Math.abs(dbX) > 0.0001) || (Math.abs(dbY) > 0.0001) || (Math.abs(dbTurn) > 0.0001) || dpadActive;
+        boolean anyInput = (Math.abs(dbX) > 0.0001) || (Math.abs(dbY) > 0.0001) || (Math.abs(dbTurn) > 0.0001);
         setBrakeMode(!anyInput);
 
         /// telemetry output
-        t_rawX = rawX;
-        t_rawY = rawY;
-        t_rawTurn = rawTurn;
+        t_rawXInput = rawXInput;
+        t_rawYInput = rawYInput;
+        t_rawTurnInput = rawTurnInput;
 
-        t_txField += tx_field;
-        t_tyField += ty_field;
-        t_rotationCmd = rotationCmd;
+        t_shapedXInput += shapedXInput;
+        t_shapedYInput += shapedYInput;
+        t_shapedTurnInput = shapedTurnInput;
 
-        t_robotX = robotX;
-        t_robotY = robotY;
+        t_finalXDirection = finalXDirection;
+        t_finalYDirection = finalYDirection;
 
         t_lf = lf;
         t_rf = rf;
         t_lb = lb;
         t_rb = rb;
 
-        t_headingDeg = headingDeg;
         t_pose = pose;
-
     }
 
     public void setAutoPower(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
@@ -337,8 +280,6 @@ public class DriveClass {
         public double tx_field, ty_field, rotationCmd;
         public double robotX, robotY;
         public double lf, rf, lb, rb;
-        public double headingDeg;
-        public String imureset;
         public Pose2D pose;
         public String mode;
         public double currentSpeed;
@@ -346,27 +287,25 @@ public class DriveClass {
 
     public DriveTelemetry getDriveTelemetry() {
         DriveTelemetry d = new DriveTelemetry();
-        d.rawX = t_rawX;
-        d.rawY = t_rawY;
-        d.rawTurn = t_rawTurn;
+        d.rawX = t_rawXInput;
+        d.rawY = t_rawYInput;
+        d.rawTurn = t_rawTurnInput;
 
-        d.tx_field = t_txField;
-        d.ty_field = t_tyField;
-        d.rotationCmd = t_rotationCmd;
+        d.tx_field = t_shapedXInput;
+        d.ty_field = t_shapedYInput;
+        d.rotationCmd = t_shapedTurnInput;
 
-        d.robotX = t_robotX;
-        d.robotY = t_robotY;
+        d.robotX = t_finalXDirection;
+        d.robotY = t_finalYDirection;
 
         d.lf = t_lf;
         d.rf = t_rf;
         d.lb = t_lb;
         d.rb = t_rb;
 
-        d.headingDeg = t_headingDeg;
         d.pose = t_pose;
 
         d.currentSpeed = currentSpeed;
-        d.mode = runmodeFieldorientation ? "field" : "driver";
 
         return d;
     }

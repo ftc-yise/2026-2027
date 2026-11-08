@@ -30,6 +30,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.yise.DriveClass;
 
@@ -159,7 +160,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         /*
          * Call "DriveClass" code to handle Field Oriented Drive.
          */
-        FODrive.updateMotors(gamepad1,true);
+        FODrive.updateMotors(gamepad1, true);
         FODrive.handleSpeedToggle(gamepad1);
         if (gamepad1.dpad_up && !dpadupPreviouslyPressed) {
             dpadupPreviouslyPressed = true;
@@ -173,7 +174,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         if (gamepad1.dpad_down && !dpaddownPreviouslyPressed) {
             dpaddownPreviouslyPressed = true;
             if (launcherTargetRPM > 0) {
-               launcherTargetRPM -= 25;
+                launcherTargetRPM -= 25;
                 LAUNCHER_TARGET_VELOCITY = ((launcherTargetRPM / 60) * 28);
             }
         } else if (!gamepad1.dpad_down) {
@@ -183,7 +184,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         ////
         if (gamepad1.dpad_left && !dpadleftPreviouslyPressed) {
             dpadleftPreviouslyPressed = true;
-            if (launcherMinRPM < launcherTargetRPM-15) {
+            if (launcherMinRPM < launcherTargetRPM - 15) {
                 launcherMinRPM -= 15;
             }
         } else if (!gamepad1.dpad_left) {
@@ -195,7 +196,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         } else if (!gamepad1.dpad_right) {
             dpadrightPreviouslyPressed = false;
         }
-        LAUNCHER_MIN_VELOCITY = ((launcherTargetRPM-launcherMinRPM / 60) * 28);
+        LAUNCHER_MIN_VELOCITY = ((launcherTargetRPM - launcherMinRPM / 60) * 28);
 
         /*
          * Set the intake power variable to equal the right trigger, minus the left trigger.
@@ -246,7 +247,7 @@ public class Debug_FlywheelLaunchSpeed extends OpMode {
         telemetry.addData("rf", driveTel.rf);
         telemetry.addData("lb", driveTel.lb);
         telemetry.addData("rb", driveTel.rb);
-        telemetry.addData("headingDeg", driveTel.headingDeg);
+        telemetry.addData("headingDeg", driveTel.pose.getHeading(AngleUnit.DEGREES));
         telemetry.addData("poseY", driveTel.pose.getY(DistanceUnit.MM));
         telemetry.addData("poseX", driveTel.pose.getX(DistanceUnit.MM));
         telemetry.addData("currentSpeed", driveTel.currentSpeed);

@@ -30,8 +30,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.yise.DriveClass;
 
 // init
@@ -80,6 +80,7 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
     double intakePower;
     DriveClass FODrive;
     DriveClass.DriveTelemetry driveTel;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -205,7 +206,7 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
         telemetry.addData("Drive Speed: ", driveTel.currentSpeed);
         telemetry.addData("X Pos: ", driveTel.pose.getX(DistanceUnit.MM));
         telemetry.addData("Y Pos: ", driveTel.pose.getY(DistanceUnit.MM));
-        telemetry.addData("Rotation (Deg): ", driveTel.headingDeg);
+        telemetry.addData("Rotation (Deg): ", driveTel.pose.getHeading(AngleUnit.DEGREES));
     }
 
     /*
@@ -226,8 +227,8 @@ public class BioBuzzStarterbotTeleopMecanum extends OpMode {
          */
         if (gamepad1.right_bumper || gamepad2.right_bumper) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-        } else if(gamepad2.right_trigger_pressed) {
-            launcher.setVelocity(-0.5*LAUNCHER_TARGET_VELOCITY);
+        } else if (gamepad2.right_trigger_pressed) {
+            launcher.setVelocity(-0.5 * LAUNCHER_TARGET_VELOCITY);
             windmillServo.setPower(-1);
         } else {
             launcher.setVelocity(0);
