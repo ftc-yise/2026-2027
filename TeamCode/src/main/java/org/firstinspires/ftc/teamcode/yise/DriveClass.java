@@ -45,10 +45,10 @@ public class DriveClass {
         // hardware map
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "Pinpoint");
 
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "FrontLeft");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "BackLeft");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "FrontRight");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "BackRight");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "FrontLeftDrive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "BackLeftDrive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "FrontRightDrive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "BackRightDrive");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
