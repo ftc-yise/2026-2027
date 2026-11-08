@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.yise.AutoUtils;
-import org.firstinspires.ftc.teamcode.yise.DriveClass;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
+import org.firstinspires.ftc.teamcode.yise.AutoUtils;
+import org.firstinspires.ftc.teamcode.yise.DriveClass;
 
 
 @Autonomous(name = "Kitbot Shoot", group = "Auto")
@@ -30,7 +31,9 @@ public class KitbotShoot extends OpMode {
     double intakePower;
     DriveClass FODrive;
 
-    /** This method is called once at the int of the OpMode. **/
+    /**
+     * This method is called once at the int of the OpMode.
+     **/
     @Override
     public void init() {
         // hardware map
@@ -57,20 +60,25 @@ public class KitbotShoot extends OpMode {
         windmillServo.setPower(0);
         telemetry.addData("Starting Auto Program", null);
     } // yuipo
-    public void resetPowers(){
+
+    public void resetPowers() {
         intake.setPower(0);
         leftIntakeServo.setPower(0);
         rightIntakeServo.setPower(0);
         windmillServo.setPower(0);
         launcher.setVelocity(0);
     }
-    public void startIntake(){
+
+    public void startIntake() {
         intake.setPower(1);
         leftIntakeServo.setPower(1);
         rightIntakeServo.setPower(1);
     }
-    public void init_loop(){}
-    public void start(){
+
+    public void init_loop() {
+    }
+
+    public void start() {
         FODrive.stopAllMotors();
         telemetry.addData("Starting Intake", null);
         startIntake();
@@ -84,9 +92,11 @@ public class KitbotShoot extends OpMode {
         AU.moveDir(AutoUtils.backward, 250);
         telemetry.addData("Finished Auto.", null);
     }
+
     void launch() {
         launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-        while(launcher.getVelocity()<LAUNCHER_MIN_VELOCITY){}
+        while (launcher.getVelocity() < LAUNCHER_MIN_VELOCITY) {
+        }
         windmillServo.setPower(1);
         AU.timeWait(5000);
         intake.setPower(1);
@@ -104,8 +114,14 @@ public class KitbotShoot extends OpMode {
         intake.setPower(1);
         AU.timeWait(2000);
     } // robot=good shooting=best good=points
-    /** We do not use this because everything should automatically disable **/
+
+    /**
+     * We do not use this because everything should automatically disable
+     **/
     @Override
-    public void stop() {}
-    public void loop(){}
+    public void stop() {
+    }
+
+    public void loop() {
+    }
 }
